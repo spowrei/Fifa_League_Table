@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "javac",
+            "type": "shell",
+            "command": "javac",
+            "args": [
+                "--module-path",
+                "C:/Java Files/javafx-sdk-23.0.2/lib",
+                "--add-modules",
+                "javafx.controls,javafx.fxml",
+                "src/Main.java"  // src klasöründeki Main.java dosyasını belirt
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
