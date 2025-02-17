@@ -19,6 +19,8 @@ public class Main extends Application {
         TableColumn<String[], String> col5 = new TableColumn<>("M");
         TableColumn<String[], String> col6 = new TableColumn<>("P");
         TableColumn<String[], String> col7 = new TableColumn<>("AG");
+		TableColumn<String[], String> col8 = new TableColumn<>("YG");
+		TableColumn<String[], String> col9 = new TableColumn<>("A");
 
         // Sütunlara değer atama
         col1.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[0]));
@@ -28,41 +30,45 @@ public class Main extends Application {
         col5.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[4]));
         col6.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[5]));
         col7.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[6]));
+		col8.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[7]));
+        col9.setCellValueFactory(data -> new SimpleStringProperty(data.getValue()[8]));
 
-        table.getColumns().addAll(col1, col2, col3, col4, col5, col6, col7);
+        table.getColumns().addAll(col1, col2, col3, col4, col5, col6, col7, col8, col9);
 
         // Tabloya 5 oyuncu ekle ve tüm değerleri 0 yap
         ObservableList<String[]> data = FXCollections.observableArrayList(
-                new String[]{"Oyuncu 1", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Oyuncu 2", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Oyuncu 3", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Oyuncu 4", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Oyuncu 5", "0", "0", "0", "0", "0", "0"}
+			new String[]{"Ahmet", "0", "0", "0", "0", "0", "0", "0", "0"},
+			new String[]{"Kaan", "0", "0", "0", "0", "0", "0", "0", "0"},
+			new String[]{"Mehmet", "0", "0", "0", "0", "0", "0", "0", "0"},
+			new String[]{"Mustafa", "0", "0", "0", "0", "0", "0", "0", "0"},
+            new String[]{"Yahya", "0", "0", "0", "0", "0", "0", "0", "0"}
         );
         table.setItems(data);
 
         // Sag taraf: string, textfield, string, textfield, string (yan yana olacak sekilde)
         HBox rightPane = new HBox(10);
-        rightPane.getChildren().add(new Label("Player"));
+        rightPane.getChildren().add(new Label("Mustafa"));
 
         TextField tf1 = new TextField();
-        tf1.setMaxWidth(30); // Sadece iki karakter icin genislik ayarla
+        tf1.setMaxWidth(40); // Sadece iki karakter icin genislik ayarla
+		tf1.setMaxHeight(20); // Sadece iki karakter icin genislik ayarla
         rightPane.getChildren().add(tf1);
 
         rightPane.getChildren().add(new Label("-"));
 
         TextField tf2 = new TextField();
-        tf2.setMaxWidth(30); // Sadece iki karakter icin genislik ayarla
+        tf2.setMaxWidth(40); // Sadece iki karakter icin genislik ayarla
+		tf2.setMaxHeight(20); // Sadece iki karakter icin genislik ayarla
         rightPane.getChildren().add(tf2);
 
-        rightPane.getChildren().add(new Label("Player"));
+        rightPane.getChildren().add(new Label("Ahmet"));
 
         // SplitPane ile iki bolme
         SplitPane splitPane = new SplitPane(table, rightPane);
-        splitPane.setDividerPositions(0.5);
+        splitPane.setDividerPositions(0.7);
 
         // Sol uste buton
-        Button menuButton = new Button("Season History");
+        Button menuButton = new Button("Geçmiş Sezonlar");
 
         // Acilir menu
         ContextMenu contextMenu = new ContextMenu();
