@@ -1,4 +1,5 @@
 
+import java.io.File;
 import java.lang.reflect.Array;
 
 import javafx.application.Application;
@@ -12,9 +13,11 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+	private static int[][] data_arr;
+
     @Override
     public void start(Stage primaryStage) {
-        UIManager uiManager = new UIManager();
+        UIManager uiManager = new UIManager(data_arr);
         BorderPane root = uiManager.createUI();
 
         Scene scene = new Scene(root, 1000, 400);
@@ -24,20 +27,29 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        /*int season = FileOperations.get_season_count();
-        int[][] data_arr = new int[FileOperations.get_player_count()][9];
+        int season = FileOperations.get_season_count();
+        data_arr = new int[FileOperations.get_player_count()][9];
         if (season == 0) {
             FileOperations.create_new_season();
             ArrayOperations.initialize(data_arr);
+			season++;
         } else {
             FileOperations.fill_the_array(season, data_arr);
-        }*/
-
+        }
+		data_arr[0][5] = 31;
+		FileOperations.fill_season_data(season, data_arr);
         launch(args);
     }
 }
 
 class UIManager {
+
+	private static int[][] data_arr;
+
+	UIManager(int[][] arr)
+	{
+		data_arr = arr;
+	}
 
     public BorderPane createUI() {
         TableView<String[]> table = createTable();
@@ -68,14 +80,21 @@ class UIManager {
             table.getColumns().add(column);
         }
 
-        ObservableList<String[]> data = FXCollections.observableArrayList(
-                new String[]{"Ahmet", "0", "0", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Kaan", "0", "0", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Mehmet", "0", "0", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Mustafa", "0", "0", "0", "0", "0", "0", "0", "0"},
-                new String[]{"Yahya", "0", "0", "0", "0", "0", "0", "0", "0"}
-        );
-        table.setItems(data);
+
+		ObservableList<String[]> data = FXCollections.observableArrayList();
+
+		int player_count = FileOperations.get_player_count();
+		System.out.println(">>>>>>>>>" + data_arr[0][5]);
+		for (int i = 0; i < player_count; i++) {
+			String[] row = new String[9];
+			row[0] = FileOperations.get_player(i);
+			for (int j = 0; j < 8; j++) {
+				row[j + 1] = String.valueOf(data_arr[i][j]);
+			}
+			data.add(row); // Satırı veriye ekle
+		}
+		
+		table.setItems(data);
 
         return table;
     }
