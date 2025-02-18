@@ -3,9 +3,9 @@ import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.util.Scanner;
 
-public class File_Operations {
+public class FileOperations {
 
     public static String get_data(String file_name, int row, int col) {
         String ret = "0";
@@ -41,11 +41,34 @@ public class File_Operations {
         return (ret);
     }
 
-//	public static int get_player_count()
+    public static int get_player_count() {
+        try {
+            File file = new File("player_data.flt");
+            Scanner scanner = new Scanner(file);
+            int i;
+            for (i = 1; scanner.hasNextLine(); i++) {
+                String temp = scanner.nextLine();
+                if (temp.equals("")) {
+					i--;
+                    break;
+                }
+            }
+            scanner.close();
+            return (i);
+        } catch (FileNotFoundException e) {
+            System.out.println("Dosya bulunamadi.");
+            e.printStackTrace();
+        }
+        return (1);
+    }
 
+	public static int get_season_count() {
+        return (Integer.parseInt(get_data("main_data.flt", 0, 1)));
+    }
 
     public static void create_new_season() {
-        String season_name = "season" + get_data("main_data.flt", 0, 1);
+		int new_season = get_season_count()+1;
+        String season_name = "season" + new_season;
         try {
             File file = new File(season_name + "flt");
             if (!file.createNewFile()) {
@@ -66,24 +89,22 @@ public class File_Operations {
         }
     }
 
-	public static void fill_season_data(int season_num, int[][] arr)
-	{
-		try {
-      FileWriter file = new FileWriter("season" + season_num + ".flt");
-	  String player_name = get_data("season" + season_num + ".flt", 0, 0);
-	  for(int i = 0; !player_name.equals(" "); i++)
-	  {
-		file.write(player_name);
-		for (int j = 0; j < 8; j++) {
-			file.write(" " + arr[i][j]);
-		}
-		file.write("\n");
-	}
-      file.close();
-    } catch (IOException e) {
-      System.out.println("Hata 2401.");
-      e.printStackTrace();
+    public static void fill_season_data(int season_num, int[][] arr) {
+        try {
+            FileWriter file = new FileWriter("season" + season_num + ".flt");
+            String player_name = get_data("season" + season_num + ".flt", 0, 0);
+            for (int i = 0; !player_name.equals(" "); i++) {
+                file.write(player_name);
+                for (int j = 0; j < 8; j++) {
+                    file.write(" " + arr[i][j]);
+                }
+                file.write("\n");
+            }
+            file.close();
+        } catch (IOException e) {
+            System.out.println("Hata 2401.");
+            e.printStackTrace();
+        }
     }
-	}
 
 }
