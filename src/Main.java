@@ -37,7 +37,7 @@ public class Main extends Application {
             FileOperations.fill_the_array(season, data_arr);
         }
 		data_arr[0][5] = 31;
-		FileOperations.fill_season_data(season, data_arr);
+		FileOperations.fill_season_data(season, data_arr); //*  gerek yok
         launch(args);
     }
 }
@@ -84,10 +84,9 @@ class UIManager {
 		ObservableList<String[]> data = FXCollections.observableArrayList();
 
 		int player_count = FileOperations.get_player_count();
-		System.out.println(">>>>>>>>>" + data_arr[0][5]);
 		for (int i = 0; i < player_count; i++) {
 			String[] row = new String[9];
-			row[0] = FileOperations.get_player(i);
+			row[0] = FileOperations.get_player(i + 1);
 			for (int j = 0; j < 8; j++) {
 				row[j + 1] = String.valueOf(data_arr[i][j]);
 			}

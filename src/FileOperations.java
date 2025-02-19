@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class FileOperations {
 
-    public static String get_data(String file_name, int row, int col) {
+    public static String get_data(String file_name, int row, int element) {
         String ret = "0";
         try {
             File file = new File("../data/" + file_name);
@@ -17,25 +17,26 @@ public class FileOperations {
                 player_data = scanner.nextLine();
             }
             int space_count = 0;
-            int data_size = player_data.length();
             int begin_index = 0;
-            int end_index = 0;
-            for (int i = 0; i < data_size; i++) {
+            int end_index = player_data.length();
+            for (int i = 0; i < end_index; i++) {
                 if (player_data.charAt(i) == ' ') {
                     space_count++;
                 }
-                if (space_count == col && col != 0) {
-                    begin_index = i + 1;
-                } else if (space_count > col || i == data_size - 1) {
+                if (space_count == element - 1 && element != 1)
+                    begin_index = i;
+				else if(element == 1)
+					begin_index = 0;
+				if (space_count == element) {
                     end_index = i;
                     break;
                 }
             }
-            System.out.println(player_data.substring(begin_index, end_index));
-            //ret = player_data.substring(begin_index, end_index);
+            System.out.println(">>>> " + "b:" + begin_index + "  e:" + end_index + "  ->" + player_data.substring(begin_index, end_index));
+            ret = player_data.substring(begin_index, end_index);
             scanner.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Dosya bulunamadi.");
+            System.out.println("Dosya bulunamadi. 2101");
             e.printStackTrace();
         }
 
@@ -56,43 +57,45 @@ public class FileOperations {
             }
             scanner.close();
             i--;
-            System.out.println("player count: " + i);
             return (i);
         } catch (FileNotFoundException e) {
-            System.out.println("Dosya bulunamadi.");
+            System.out.println("Dosya bulunamadi.2201");
             e.printStackTrace();
         }
         return (1);
     }
 
     public static int get_season_count() {
-        return (Integer.parseInt(get_data("main_data.flt", 0, 1)));
+        return (Integer.parseInt(get_data("main_data.flt", 1, 2)));
     }
 
     public static String get_player(int i) {
-		System.out.println("<<<<<<" + get_data("player_data.flt", i, 0));
-        return (get_data("player_data.flt", i, 0));
+        return (get_data("player_data.flt", i, 1));
     }
 
-    public static void create_new_season() {
-        int new_season = get_season_count() + 1;
-        String season_name = "season" + new_season;
-        try {
-            File file = new File("../data/" + season_name + ".flt");
-            if (!file.createNewFile()) {
-                System.out.println("Dosya zaten var.");
-            }
-        } catch (IOException e) {
-            System.out.println("Hata 2201.");
-            e.printStackTrace();
-        }
-    }
+	public static void create_new_season() {
+		int new_season = get_season_count() + 1;
+		String[] file_names = {"season" + new_season, "seasonf" + new_season};
+	
+		for (int i = 0; i < file_names.length; i++) {
+			String file_name = file_names[i];
+			try {
+				File file = new File("../data/" + file_name + ".flt");
+				if (!file.createNewFile()) {
+					System.out.println("Dosya zaten var: " + file_name);
+				}
+			} catch (IOException e) {
+				System.out.println("Hata 2201: " + file_name);
+				e.printStackTrace();
+			}
+		}
+	}
 
     public static void fill_the_array(int season_num, int[][] arr) {
         int player_count = arr.length;
-        for (int i = 0; i < player_count; i++) {
-            for (int j = 0; j < 8; j++) {
-                arr[i][j] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
+        for (int i = 1; i <= player_count; i++) {
+            for (int j = 1; j <= 8; j++) {
+                arr[i-1][j-1] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
             }
         }
     }
