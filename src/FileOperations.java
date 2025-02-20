@@ -3,6 +3,8 @@ import java.io.File;  // Import the File class
 import java.io.FileNotFoundException;  // Import this class to handle errors
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class FileOperations {
@@ -77,7 +79,7 @@ public class FileOperations {
 		int new_season = get_season_count() + 1;
 		String[] file_names = {"season" + new_season, "seasonf" + new_season};
 	
-		for (int i = 0; i < file_names.length; i++) {
+		for (int i = 0; i < 2; i++) {
 			String file_name = file_names[i];
 			try {
 				File file = new File("../data/" + file_name + ".flt");
@@ -117,5 +119,39 @@ public class FileOperations {
             e.printStackTrace();
         }
     }
+
+    public static void create_new_fixture(int n) {
+		int season = get_season_count() +1;
+		String file_name = "../data/" + "seasonf" + season +".flt";
+		try {
+            FileWriter file = new FileWriter(file_name);
+
+			ArrayList<String> pairs = new ArrayList<>();
+        
+        // İkili kombinasyonları oluştur
+        for (int i = 1; i <= n; i++) {
+            for (int j = i + 1; j <= n; j++) {
+                pairs.add(i + " " + j);
+            }
+        }
+        
+        // Rastgele sırayla yazdır
+        Collections.shuffle(pairs);
+        
+        for (String pair : pairs) {
+            file.write(pair + " 0 0\n");
+        }
+        for (String pair : pairs) {
+            String[] numbers = pair.split(" ");
+            file.write(numbers[1] + " " + numbers[0] + " 0 0\n");
+        }
+
+		file.close();
+        } catch (IOException e) {
+            System.out.println("Bir hata olustu. fixture_creater");
+            e.printStackTrace();
+        }
+    }
+
 
 }

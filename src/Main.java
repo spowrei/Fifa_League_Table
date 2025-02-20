@@ -1,7 +1,4 @@
 
-import java.io.File;
-import java.lang.reflect.Array;
-
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -28,10 +25,12 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         int season = FileOperations.get_season_count();
-        data_arr = new int[FileOperations.get_player_count()][9];
+		int player_count = FileOperations.get_player_count();
+        data_arr = new int[player_count][9];
         if (season == 0) {
             FileOperations.create_new_season();
             ArrayOperations.initialize(data_arr);
+			FileOperations.create_new_fixture(player_count);
 			season++;
         } else {
             FileOperations.fill_the_array(season, data_arr);

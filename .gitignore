@@ -1,2 +1,4 @@
 *.class
 season*.flt
+*.sh
+.vscode

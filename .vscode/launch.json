@@ -1,12 +1,19 @@
 {
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "java",
-            "name": "Launch JavaFX Application",
-            "request": "launch",
-            "mainClass": "src.Main",  // src klasöründeki Main sınıfını hedef al
-            "vmArgs": "--module-path C:/Java Files/javafx-sdk-23.0.2/lib --add-modules javafx.controls,javafx.fxml"
-        }
-    ]
+		{
+			"type": "java",
+			"name": "RandomNumberPairs",
+			"request": "launch",
+			"mainClass": "RandomNumberPairs",
+			"projectName": "Fifa-League-Table_ecaebcfd"
+		},
+		{
+			"type": "java",
+			"name": "Launch JavaFX Application",
+			"request": "launch",
+			"mainClass": "src.Main",
+			"vmArgs": "--module-path C:/Java Files/javafx-sdk-23.0.2/lib --add-modules javafx.controls,javafx.fxml"
+		}
+	]
 }
