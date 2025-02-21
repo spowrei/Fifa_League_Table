@@ -7,31 +7,36 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
+
 
 public class Main extends Application {
 
 	private static int[][] data_arr;
+	private static int season;
+	private static int player_count;
 
     @Override
     public void start(Stage primaryStage) {
         UIManager uiManager = new UIManager(data_arr);
         BorderPane root = uiManager.createUI();
 
-        Scene scene = new Scene(root, 1000, 400);
+        Scene scene = new Scene(root, 720, 620);
         primaryStage.setTitle("Fifa League Table");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     public static void main(String[] args) {
-        int season = FileOperations.get_season_count();
-		int player_count = FileOperations.get_player_count();
+        season = FileOperations.get_season_count();
+		player_count = FileOperations.get_player_count();
         data_arr = new int[player_count][9];
         if (season == 0) {
             FileOperations.create_new_season();
             ArrayOperations.initialize(data_arr);
 			FileOperations.create_new_fixture(player_count);
-			season++;
+			season=1;
+			//FileOperations.set_data("main_data.flt", 1, 2, "1");
         } else {
             FileOperations.fill_the_array(season, data_arr);
         }
@@ -52,13 +57,13 @@ class UIManager {
 
     public BorderPane createUI() {
         TableView<String[]> table = createTable();
-        HBox rightPane = createRightPane();
+        VBox rightPane = createRightPane();
         Button menuButton = createMenuButton();
 
         SplitPane splitPane = new SplitPane(table, rightPane);
-        splitPane.setDividerPositions(0.7);
+        splitPane.setDividerPositions(0.64);
 
-        HBox topBar = new HBox(10, menuButton);
+        VBox topBar = new VBox(10, menuButton);
 
         BorderPane root = new BorderPane();
         root.setTop(topBar);
@@ -97,29 +102,48 @@ class UIManager {
         return table;
     }
 
-    private HBox createRightPane() {
-        HBox rightPane = new HBox(10);
-        rightPane.getChildren().add(new Label("Mustafa"));
-
-        TextField tf1 = new TextField();
-        tf1.setMaxWidth(25);
-        tf1.setPrefHeight(20); // Yüksekliği küçült
-        tf1.setStyle("-fx-font-size: 16px; -fx-padding: 2px;"); // Padding ve font ayarıyla daha küçük görünmesini sağla
-        rightPane.getChildren().add(tf1);
-
-        rightPane.getChildren().add(new Label("-"));
-
-        TextField tf2 = new TextField();
-        tf2.setMaxWidth(25);
-        tf2.setPrefHeight(20);
-        tf2.setStyle("-fx-font-size: 16px; -fx-padding: 2px;");
-        rightPane.getChildren().add(tf2);
-
-        rightPane.getChildren().add(new Label("Ahmet"));
-
-        return rightPane;
-    }
-
+	private VBox createRightPane() {
+		String[] player_arr = FileOperations.create_player_array();
+		int player_count = player_arr.length;
+		int line_count = 0; 
+		int season = FileOperations.get_season_count() + 1; // ! sezon sayısını yaz şuan +1 yazıyor
+		
+		for (int i = 1; i < player_count; i++) {
+			line_count += i;
+		}
+		line_count *= 2;
+	
+		VBox vbox = new VBox(5); // Satırları alt alta dizmek için VBox
+	
+		for (int i = 1; i <= line_count; i++) {
+			HBox row = new HBox(10);
+			row.setAlignment(Pos.CENTER);
+			row.getChildren().add(new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i+1, 1))]));
+	
+			TextField tf1 = new TextField();
+			tf1.setMaxWidth(25);
+			tf1.setPrefHeight(20);
+			tf1.setStyle("-fx-font-size: 16px; -fx-padding: 2px;");
+			row.getChildren().add(tf1);
+	
+			row.getChildren().add(new Label("-"));
+	
+			TextField tf2 = new TextField();
+			tf2.setMaxWidth(25);
+			tf2.setPrefHeight(20);
+			tf2.setStyle("-fx-font-size: 16px; -fx-padding: 2px;");
+			row.getChildren().add(tf2);
+	
+			row.getChildren().add(new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i+1, 2))]));
+	
+			vbox.getChildren().add(row); // Satırı VBox içine ekleyerek alt alta diziyoruz
+		}
+	
+		return vbox;
+	}
+	
+	
+	// > menü butonunu geçmiş sezonlara göre ayarla
     private Button createMenuButton() {
         Button menuButton = new Button("Geçmiş Sezonlar");
 
@@ -137,7 +161,7 @@ class UIManager {
         return menuButton;
     }
 
-    private void applyStyles(BorderPane root, TableView<String[]> table, HBox rightPane, Button menuButton) {
+    private void applyStyles(BorderPane root, TableView<String[]> table, VBox rightPane, Button menuButton) {
         String css = """
             -fx-background-color:rgb(233, 233, 233);
             -fx-control-inner-background:rgb(233, 233, 233);
@@ -149,8 +173,8 @@ class UIManager {
         """;
 
         root.setStyle(css);
-        table.setStyle("-fx-background-color: #A3D1C6;");
-        rightPane.setStyle("-fx-background-color: #A3D1C6;");
+        table.setStyle("-fx-background-color: #3D8D7A; -fx-text-fill:rgb(233, 233, 233);");
+        rightPane.setStyle("-fx-background-color:rgb(77, 175, 152); -fx-text-fill:rgb(233, 233, 233);");
         menuButton.setStyle("-fx-background-color: #3D8D7A; -fx-text-fill:rgb(233, 233, 233);");
     }
 }

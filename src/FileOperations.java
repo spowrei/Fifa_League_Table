@@ -1,10 +1,12 @@
 
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class FileOperations {
@@ -25,11 +27,12 @@ public class FileOperations {
                 if (player_data.charAt(i) == ' ') {
                     space_count++;
                 }
-                if (space_count == element - 1 && element != 1)
-                    begin_index = i;
-				else if(element == 1)
-					begin_index = 0;
-				if (space_count == element) {
+                if (space_count == element - 1 && element != 1) {
+                    begin_index = i; 
+                }else if (element == 1) {
+                    begin_index = 0;
+                }
+                if (space_count == element) {
                     end_index = i;
                     break;
                 }
@@ -43,6 +46,29 @@ public class FileOperations {
         }
 
         return (ret);
+    }
+
+    public static void set_data(String file_name, int row, int element, String new_value) {
+        try {
+            File file = new File("../data/" + file_name);
+            List<String> lines = new ArrayList<>();
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                lines.add(scanner.nextLine());
+            }
+            scanner.close();
+            String[] data = lines.get(row - 1).split(" ");
+            data[element - 1] = new_value;
+            lines.set(row - 1, String.join(" ", data));
+            PrintWriter writer = new PrintWriter(new FileWriter(file));
+            for (String line : lines) {
+                writer.println(line);
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Dosya islem hatasi olustu.");
+            e.printStackTrace();
+        }
     }
 
     public static int get_player_count() {
@@ -71,33 +97,33 @@ public class FileOperations {
         return (Integer.parseInt(get_data("main_data.flt", 1, 2)));
     }
 
-    public static String get_player(int i) {
+    public static String get_player(int i) { //! buna bi bak
         return (get_data("player_data.flt", i, 1));
     }
 
-	public static void create_new_season() {
-		int new_season = get_season_count() + 1;
-		String[] file_names = {"season" + new_season, "seasonf" + new_season};
-	
-		for (int i = 0; i < 2; i++) {
-			String file_name = file_names[i];
-			try {
-				File file = new File("../data/" + file_name + ".flt");
-				if (!file.createNewFile()) {
-					System.out.println("Dosya zaten var: " + file_name);
-				}
-			} catch (IOException e) {
-				System.out.println("Hata 2201: " + file_name);
-				e.printStackTrace();
-			}
-		}
-	}
+    public static void create_new_season() {
+        int new_season = get_season_count() + 1;
+        String[] file_names = {"season" + new_season, "seasonf" + new_season};
+
+        for (int i = 0; i < 2; i++) {
+            String file_name = file_names[i];
+            try {
+                File file = new File("../data/" + file_name + ".flt");
+                if (!file.createNewFile()) {
+                    System.out.println("Dosya zaten var: " + file_name);
+                }
+            } catch (IOException e) {
+                System.out.println("Hata 2201: " + file_name);
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static void fill_the_array(int season_num, int[][] arr) {
         int player_count = arr.length;
         for (int i = 1; i <= player_count; i++) {
             for (int j = 1; j <= 8; j++) {
-                arr[i-1][j-1] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
+                arr[i - 1][j - 1] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
             }
         }
     }
@@ -121,37 +147,45 @@ public class FileOperations {
     }
 
     public static void create_new_fixture(int n) {
-		int season = get_season_count() +1;
-		String file_name = "../data/" + "seasonf" + season +".flt";
-		try {
+        int season = get_season_count() + 1;
+        String file_name = "../data/" + "seasonf" + season + ".flt";
+        try {
             FileWriter file = new FileWriter(file_name);
 
-			ArrayList<String> pairs = new ArrayList<>();
-        
-        // İkili kombinasyonları oluştur
-        for (int i = 1; i <= n; i++) {
-            for (int j = i + 1; j <= n; j++) {
-                pairs.add(i + " " + j);
-            }
-        }
-        
-        // Rastgele sırayla yazdır
-        Collections.shuffle(pairs);
-        
-        for (String pair : pairs) {
-            file.write(pair + " 0 0\n");
-        }
-        for (String pair : pairs) {
-            String[] numbers = pair.split(" ");
-            file.write(numbers[1] + " " + numbers[0] + " 0 0\n");
-        }
+            ArrayList<String> pairs = new ArrayList<>();
 
-		file.close();
+            // İkili kombinasyonları oluştur
+            for (int i = 0; i < n; i++) {
+                for (int j = i; j < n; j++) {
+                    pairs.add(i + " " + j);
+                }
+            }
+
+            // Rastgele sırayla yazdır
+            Collections.shuffle(pairs);
+
+            for (String pair : pairs) {
+                file.write(pair + " 0 0\n");
+            }
+            for (String pair : pairs) {
+                String[] numbers = pair.split(" ");
+                file.write(numbers[1] + " " + numbers[0] + " 0 0\n");
+            }
+
+            file.close();
         } catch (IOException e) {
             System.out.println("Bir hata olustu. fixture_creater");
             e.printStackTrace();
         }
     }
 
+    public static String[] create_player_array() {
+        int player_count = get_player_count();
+        String[] arr = new String[player_count];
 
+        for (int i = 0; i < player_count; i++) {
+            arr[i] = get_data("../data/player_data.flt", i+1, 1);
+        }
+        return (arr);
+    }
 }
