@@ -34,11 +34,11 @@ public class Main extends Application {
         player_count = FileOperations.get_player_count();
         data_arr = new int[player_count][9];
         if (season == 0) {
+			season = 1;
+            FileOperations.set_data("main_data.flt", 1, 2, "1");
             FileOperations.create_new_season();
             ArrayOperations.initialize(data_arr);
             FileOperations.create_new_fixture(player_count);
-            season = 1;
-            //FileOperations.set_data("main_data.flt", 1, 2, "1");
         } else {
             FileOperations.fill_the_array(season, data_arr);
         }
@@ -58,7 +58,7 @@ class UIManager {
 
     public BorderPane createUI() {
         TableView<String[]> table = createTable();
-        VBox rightPane = createRightPane();
+        VBox rightPane = createRightPane(data_arr);
         Button menuButton = createMenuButton();
 
         SplitPane splitPane = new SplitPane(table, rightPane);
@@ -102,11 +102,11 @@ class UIManager {
         return table;
     }
 
-    private VBox createRightPane() {
+    private VBox createRightPane(int[][] array) {
         String[] player_arr = FileOperations.create_player_array();
         int player_count = player_arr.length;
         int line_count = 0;
-        int season = FileOperations.get_season_count() + 1; //! duzelt
+        int season = FileOperations.get_season_count();
 
         for (int i = 1; i < player_count; i++) {
             line_count += i;
@@ -164,16 +164,20 @@ class UIManager {
             final int index = i;  // i'yi sabitlemek için final kullanıyoruz
 
             tf.textProperty().addListener((observable, oldValue, newValue) -> {
-			FileOperations.set_data("seasonf" + season + ".flt", (index/2)+1, (index % 2)+3, newValue);
-            });
+				String valueToSet = newValue;
+				// \\d rakamıifade eder, \\d+ birden fazla rakamı ifade eder
+				if (newValue == null || newValue.trim().isEmpty() || !newValue.matches("\\d+"))
+					valueToSet = "-";
+				FileOperations.set_data("seasonf" + season + ".flt", (index/2) + 1, (index % 2) + 3, valueToSet);
+				ArrayOperations.fixture_to_season_array(player_count, array);
+			});
         }
-
         return vbox;
     }
 
     // > menü butonunu geçmiş sezonlara göre ayarla
     private Button createMenuButton() {
-        Button menuButton = new Button("Geçmiş Sezonlar");
+        Button menuButton = new Button("Sezonlar");
 
         ContextMenu contextMenu = new ContextMenu();
         MenuItem item1 = new MenuItem("Sezon 1");

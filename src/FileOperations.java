@@ -102,7 +102,7 @@ public class FileOperations {
     }
 
     public static void create_new_season() {
-        int new_season = get_season_count() + 1;
+        int new_season = get_season_count();
         String[] file_names = {"season" + new_season, "seasonf" + new_season};
 
         for (int i = 0; i < 2; i++) {
@@ -147,8 +147,7 @@ public class FileOperations {
     }
 
     public static void create_new_fixture(int n) {
-        int season = get_season_count() + 1;
-        String file_name = "../data/" + "seasonf" + season + ".flt";
+        String file_name = "../data/" + "seasonf" + get_season_count() + ".flt";
         try {
             FileWriter file = new FileWriter(file_name);
 
@@ -165,11 +164,11 @@ public class FileOperations {
             Collections.shuffle(pairs);
 
             for (String pair : pairs) {
-                file.write(pair + " 0 0\n");
+                file.write(pair + " - -\n");
             }
             for (String pair : pairs) {
                 String[] numbers = pair.split(" ");
-                file.write(numbers[1] + " " + numbers[0] + " 0 0\n");
+                file.write(numbers[1] + " " + numbers[0] + " - -\n");
             }
 
             file.close();
@@ -184,8 +183,29 @@ public class FileOperations {
         String[] arr = new String[player_count];
 
         for (int i = 0; i < player_count; i++) {
-            arr[i] = get_data("../data/player_data.flt", i+1, 1);
+            arr[i] = get_data("player_data.flt", i+1, 1);
         }
         return (arr);
     }
-}
+
+	public static String[] give_fixture_line(int n)
+	{
+		String[] ret = new String[4];
+        try {
+            File file = new File("../data/" + "seasonf" + get_season_count() + ".flt");
+            String player_data = "";
+            Scanner scanner = new Scanner(file);
+            for (int i = 0; i < n; i++) {
+                player_data = scanner.nextLine();
+            }
+			ret = player_data.split(" ");
+
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Dosya bulunamadi. 2901");
+            e.printStackTrace();
+        }
+        return (ret);
+    }
+	}
+
