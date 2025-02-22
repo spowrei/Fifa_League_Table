@@ -20,11 +20,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        UIManager uiManager = new UIManager(data_arr);
-        BorderPane root = uiManager.createUI();
+        UIManager uiManager = new UIManager(data_arr, primaryStage);
+        BorderPane root = uiManager.createUI(season);
 
         Scene scene = new Scene(root, 720, 620);
         primaryStage.setTitle("Fifa League Table");
+		uiManager.rename_stage();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -42,7 +43,6 @@ public class Main extends Application {
         } else {
             FileOperations.fill_the_array(season, data_arr);
         }
-        data_arr[0][5] = 31;
         FileOperations.fill_season_data(season, data_arr); //*  gerek yok
         launch(args);
     }
@@ -51,15 +51,27 @@ public class Main extends Application {
 class UIManager {
 
     private static int[][] data_arr;
+	private Button menuButton;
+	private ContextMenu contextMenu;
+	private int player_count;
+	private Stage stage; 
 
-    UIManager(int[][] arr) {
+    UIManager(int[][] arr, Stage primaryStage) {
         data_arr = arr;
+		player_count = FileOperations.get_player_count();
+		stage = primaryStage;
+		rename_stage();
     }
 
-    public BorderPane createUI() {
+	public void rename_stage()
+	{
+		stage.setTitle("Fifa League Title (Season: " + FileOperations.get_season_count() + ")");
+	}
+
+    public BorderPane createUI(int season) {
         TableView<String[]> table = createTable();
         VBox rightPane = createRightPane(data_arr, table);
-        Button menuButton = createMenuButton();
+        menuButton = create_season_menu(season);
 
         SplitPane splitPane = new SplitPane(table, rightPane);
         splitPane.setDividerPositions(0.64);
@@ -87,7 +99,6 @@ class UIManager {
 
         ObservableList<String[]> data = FXCollections.observableArrayList();
 
-        int player_count = FileOperations.get_player_count();
         for (int i = 0; i < player_count; i++) {
             String[] row = new String[9];
             row[0] = FileOperations.get_player(i + 1);
@@ -105,7 +116,6 @@ class UIManager {
 	private void updateTable(TableView<String[]> table) {
 		ObservableList<String[]> data = FXCollections.observableArrayList();
 	
-		int player_count = FileOperations.get_player_count();
 		for (int i = 0; i < player_count; i++) {
 			String[] row = new String[9];
 			row[0] = FileOperations.get_player(i + 1);
@@ -118,10 +128,8 @@ class UIManager {
 		table.setItems(data); // Sadece veriyi güncelle
 	}
 	
-
     private VBox createRightPane(int[][] array, TableView<String[]> table) {
         String[] player_arr = FileOperations.create_player_array();
-        int player_count = player_arr.length;
         int line_count = 0;
         int season = FileOperations.get_season_count();
 
@@ -193,23 +201,43 @@ class UIManager {
         return vbox;
     }
 
-    // > menü butonunu geçmiş sezonlara göre ayarla
-    private Button createMenuButton() {
-        Button menuButton = new Button("Sezonlar");
+    private Button create_season_menu(int season) {
+        menuButton = new Button("Sezonlar");
+        contextMenu = new ContextMenu();
 
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem item1 = new MenuItem("Sezon 1");
-        MenuItem item2 = new MenuItem("Sezon 2");
-        MenuItem item3 = new MenuItem("Sezon 3");
-        MenuItem item4 = new MenuItem("YENİ SEZON +");
-        contextMenu.getItems().addAll(item1, item2, item3, item4);
-
+        update_season_menu(season);
         menuButton.setOnAction(e -> contextMenu.show(menuButton,
                 menuButton.localToScreen(0, menuButton.getHeight()).getX(),
                 menuButton.localToScreen(0, menuButton.getHeight()).getY()));
-
-        return menuButton;
+		return (menuButton);
     }
+
+	private void update_season_menu(int season) {
+        contextMenu.getItems().clear();
+        int season_count = FileOperations.get_season_count();
+        for (int i = 1; i <= season_count; i++) {
+            MenuItem item = new MenuItem("Sezon " + i);
+            contextMenu.getItems().add(item);
+        }
+        
+        MenuItem newSeason = new MenuItem("YENİ SEZON +");
+        newSeason.setOnAction(e -> {
+            new_season(season);
+        });
+        
+        contextMenu.getItems().add(newSeason);
+    }
+
+	private void new_season(int season)
+	{
+		season++;
+		FileOperations.set_data("main_data.flt", 1, 2, String.valueOf(season));
+		FileOperations.create_new_season();
+            ArrayOperations.initialize(data_arr);
+            FileOperations.create_new_fixture(player_count);
+		update_season_menu(season);
+		rename_stage();
+	}
 
     private void applyStyles(BorderPane root, TableView<String[]> table, VBox rightPane, Button menuButton) {
         String css = """
@@ -223,7 +251,7 @@ class UIManager {
         """;
 
         root.setStyle(css);
-        table.setStyle("-fx-background-color:rgb(44, 66, 165); -fx-text-fill:rgb(233, 233, 233);");
+        table.setStyle("-fx-background-color:rgb(93, 146, 245); -fx-text-fill:rgb(233, 233, 233);");
         rightPane.setStyle("-fx-background-color:rgb(173, 175, 77); -fx-text-fill:rgb(233, 233, 233);");
         menuButton.setStyle("-fx-background-color:rgb(33, 206, 91); -fx-text-fill:rgb(233, 233, 233);");
     }
