@@ -50,17 +50,19 @@ public class Main extends Application {
 
 class UIManager {
 
-    private static int[][] data_arr;
+    private static int[][] data_arr; //static olabilir mi final olabilir mi
 	private Button menuButton;
 	private ContextMenu contextMenu;
 	private int player_count;
-	private Stage stage; 
+	private Stage stage;
+	private List<TextField> textFields;
+	private String[] player_arr;
 
     UIManager(int[][] arr, Stage primaryStage) {
         data_arr = arr;
 		player_count = FileOperations.get_player_count();
 		stage = primaryStage;
-		rename_stage();
+		//? rename_stage();
     }
 
 	public void rename_stage()
@@ -125,13 +127,12 @@ class UIManager {
 			data.add(row);
 		}
 	
-		table.setItems(data); // Sadece veriyi güncelle
+		table.setItems(data);
 	}
 	
     private VBox createRightPane(int[][] array, TableView<String[]> table) {
-        String[] player_arr = FileOperations.create_player_array();
+        player_arr = FileOperations.create_player_array();
         int line_count = 0;
-        int season = FileOperations.get_season_count();
 
         for (int i = 1; i < player_count; i++) {
             line_count += i;
@@ -141,15 +142,14 @@ class UIManager {
         VBox vbox = new VBox(5);
         vbox.setPadding(new Insets(5, 0, 0, 0));
 
-        // TextField'leri tutacak bir liste oluştur
-        List<TextField> textFields = new ArrayList<>();
+        textFields = new ArrayList<>();
 
         for (int i = 1; i <= line_count; i++) {
             HBox row = new HBox(10);
             row.setAlignment(Pos.CENTER);
 
             // Oyuncu adlarını hizalamak için sabit genişlik
-            Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 1))]);
+            Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + FileOperations.get_season_count() + ".flt", i, 1))]);
             player1.setMinWidth(80); // Genişlik belirle
             player1.setAlignment(Pos.CENTER_RIGHT);
 
@@ -175,7 +175,7 @@ class UIManager {
             // TextField'i listeye ekle
             textFields.add(tf2);
 
-            Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 2))]);
+            Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + FileOperations.get_season_count() + ".flt", i, 2))]);
             player2.setMinWidth(80);
             player2.setAlignment(Pos.CENTER_LEFT);
 
@@ -193,7 +193,7 @@ class UIManager {
 				// \\d rakamıifade eder, \\d+ birden fazla rakamı ifade eder
 				if (newValue == null || newValue.trim().isEmpty() || !newValue.matches("\\d+"))
 					valueToSet = "-";
-				FileOperations.set_data("seasonf" + season + ".flt", (index/2) + 1, (index % 2) + 3, valueToSet);
+				FileOperations.set_data("seasonf" + FileOperations.get_season_count() + ".flt", (index/2) + 1, (index % 2) + 3, valueToSet);
 				ArrayOperations.fixture_to_season_array(player_count, array);
 				updateTable(table);
 			});
@@ -201,6 +201,12 @@ class UIManager {
         return vbox;
     }
 
+	private void reset_text_fields() {
+		for (int i = 0; i < textFields.size(); i++) {
+			textFields.get(i).setText("");
+		}
+	}
+	
     private Button create_season_menu(int season) {
         menuButton = new Button("Sezonlar");
         contextMenu = new ContextMenu();
@@ -230,13 +236,17 @@ class UIManager {
 
 	private void new_season(int season)
 	{
+		FileOperations.fill_season_data(season, data_arr);
 		season++;
 		FileOperations.set_data("main_data.flt", 1, 2, String.valueOf(season));
 		FileOperations.create_new_season();
-            ArrayOperations.initialize(data_arr);
-            FileOperations.create_new_fixture(player_count);
+		ArrayOperations.initialize(data_arr);
+		FileOperations.fill_season_data(season, data_arr);
+		FileOperations.create_new_fixture(player_count);
+		player_arr = FileOperations.create_player_array(); //>  ismini değiş fonksiyonun
 		update_season_menu(season);
 		rename_stage();
+		reset_text_fields();
 	}
 
     private void applyStyles(BorderPane root, TableView<String[]> table, VBox rightPane, Button menuButton) {
