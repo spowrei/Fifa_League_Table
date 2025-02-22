@@ -58,7 +58,7 @@ class UIManager {
 
     public BorderPane createUI() {
         TableView<String[]> table = createTable();
-        VBox rightPane = createRightPane(data_arr);
+        VBox rightPane = createRightPane(data_arr, table);
         Button menuButton = createMenuButton();
 
         SplitPane splitPane = new SplitPane(table, rightPane);
@@ -102,7 +102,24 @@ class UIManager {
         return table;
     }
 
-    private VBox createRightPane(int[][] array) {
+	private void updateTable(TableView<String[]> table) {
+		ObservableList<String[]> data = FXCollections.observableArrayList();
+	
+		int player_count = FileOperations.get_player_count();
+		for (int i = 0; i < player_count; i++) {
+			String[] row = new String[9];
+			row[0] = FileOperations.get_player(i + 1);
+			for (int j = 0; j < 8; j++) {
+				row[j + 1] = String.valueOf(data_arr[i][j]);
+			}
+			data.add(row);
+		}
+	
+		table.setItems(data); // Sadece veriyi güncelle
+	}
+	
+
+    private VBox createRightPane(int[][] array, TableView<String[]> table) {
         String[] player_arr = FileOperations.create_player_array();
         int player_count = player_arr.length;
         int line_count = 0;
@@ -124,7 +141,7 @@ class UIManager {
             row.setAlignment(Pos.CENTER);
 
             // Oyuncu adlarını hizalamak için sabit genişlik
-            Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i + 1, 1))]);
+            Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 1))]);
             player1.setMinWidth(80); // Genişlik belirle
             player1.setAlignment(Pos.CENTER_RIGHT);
 
@@ -150,7 +167,7 @@ class UIManager {
             // TextField'i listeye ekle
             textFields.add(tf2);
 
-            Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i + 1, 2))]);
+            Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 2))]);
             player2.setMinWidth(80);
             player2.setAlignment(Pos.CENTER_LEFT);
 
@@ -170,6 +187,7 @@ class UIManager {
 					valueToSet = "-";
 				FileOperations.set_data("seasonf" + season + ".flt", (index/2) + 1, (index % 2) + 3, valueToSet);
 				ArrayOperations.fixture_to_season_array(player_count, array);
+				updateTable(table);
 			});
         }
         return vbox;
@@ -197,7 +215,7 @@ class UIManager {
         String css = """
             -fx-background-color:rgb(233, 233, 233);
             -fx-control-inner-background:rgb(233, 233, 233);
-            -fx-accent: #3D8D7A;
+            -fx-accent:rgb(219, 10, 10);
             -fx-focus-color: #B3D8A8;
             -fx-text-fill: #000000;
             -fx-font-size: 18px;
@@ -205,8 +223,8 @@ class UIManager {
         """;
 
         root.setStyle(css);
-        table.setStyle("-fx-background-color: #3D8D7A; -fx-text-fill:rgb(233, 233, 233);");
-        rightPane.setStyle("-fx-background-color:rgb(77, 175, 152); -fx-text-fill:rgb(233, 233, 233);");
-        menuButton.setStyle("-fx-background-color: #3D8D7A; -fx-text-fill:rgb(233, 233, 233);");
+        table.setStyle("-fx-background-color:rgb(44, 66, 165); -fx-text-fill:rgb(233, 233, 233);");
+        rightPane.setStyle("-fx-background-color:rgb(173, 175, 77); -fx-text-fill:rgb(233, 233, 233);");
+        menuButton.setStyle("-fx-background-color:rgb(33, 206, 91); -fx-text-fill:rgb(233, 233, 233);");
     }
 }

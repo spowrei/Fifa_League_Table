@@ -37,7 +37,6 @@ public class FileOperations {
                     break;
                 }
             }
-            System.out.println(">>>> " + "b:" + begin_index + "  e:" + end_index + "  ->" + player_data.substring(begin_index, end_index));
             ret = player_data.substring(begin_index, end_index);
             scanner.close();
         } catch (FileNotFoundException e) {
@@ -146,7 +145,7 @@ public class FileOperations {
         }
     }
 
-    public static void create_new_fixture(int n) {
+    public static void create_new_fixture(int player_count) {
         String file_name = "../data/" + "seasonf" + get_season_count() + ".flt";
         try {
             FileWriter file = new FileWriter(file_name);
@@ -154,8 +153,8 @@ public class FileOperations {
             ArrayList<String> pairs = new ArrayList<>();
 
             // İkili kombinasyonları oluştur
-            for (int i = 0; i < n; i++) {
-                for (int j = i; j < n; j++) {
+            for (int i = 0; i < player_count; i++) {
+                for (int j = i + 1; j < player_count; j++) {
                     pairs.add(i + " " + j);
                 }
             }
