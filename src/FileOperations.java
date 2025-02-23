@@ -121,8 +121,8 @@ public class FileOperations {
     public static void fill_the_array(int season_num, int[][] arr) {
         int player_count = arr.length;
         for (int i = 1; i <= player_count; i++) {
-            for (int j = 1; j <= 8; j++) {
-                arr[i - 1][j - 1] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
+            for (int j = 2; j <= 9; j++) {
+                arr[i - 1][j - 2] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));
             }
         }
     }
