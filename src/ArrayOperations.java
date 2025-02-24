@@ -11,7 +11,7 @@ public class ArrayOperations {
 	}
 
 
-	public static void fixture_to_season_array(int player_count, int[][] arr)
+	public static void fixture_to_season_array(int[][] arr, int player_count, int season)
 	{
 		int line_count = 0;
 
@@ -21,7 +21,7 @@ public class ArrayOperations {
         }
         line_count *= 2;
 		for (int i = 1; i <= line_count; i++) {
-			String[] line = FileOperations.give_fixture_line(i);
+			String[] line = FileOperations.give_fixture_line(i, season);
 			if (line[2].equals("-") || line[3].equals("-"))
 				continue;
 			int p1 = Integer.parseInt(line[0]);

@@ -24,7 +24,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         UIManager uiManager = new UIManager(data_arr, primaryStage);
-        BorderPane root = uiManager.createUI(season);
+        BorderPane root = uiManager.createUI();
         Scene scene = new Scene(root, 720, 620);
         primaryStage.setTitle("Fifa League Table");
 		uiManager.rename_stage();
@@ -65,23 +65,24 @@ class UIManager {
 	private String[] player_arr;
 	private VBox vbox;
 	private TableView<String[]> table;
+	private int season;
 
     UIManager(int[][] arr, Stage primaryStage) {
         data_arr = arr;
 		player_count = FileOperations.get_player_count();
 		stage = primaryStage;
-		//? rename_stage();
+		season = FileOperations.get_season_count();
     }
 
 	public void rename_stage()
 	{
-		stage.setTitle("Fifa League Title (Season: " + FileOperations.get_season_count() + ")");
+		stage.setTitle("Fifa League Title (Season: " + season + ")");
 	}
 
-    public BorderPane createUI(int season) {
+    public BorderPane createUI() {
         table = createTable();
         VBox rightPane = createRightPane();
-        menuButton = create_season_menu(season);
+        menuButton = create_season_menu();
 
         SplitPane splitPane = new SplitPane(table, rightPane);
         splitPane.setDividerPositions(0.64);
@@ -125,10 +126,10 @@ class UIManager {
 
 	private void updateTable() {
 		ObservableList<String[]> data = FXCollections.observableArrayList();
-	
+		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
 		for (int i = 0; i < player_count; i++) {
 			String[] row = new String[9];
-			row[0] = FileOperations.get_player(i + 1);
+			row[0] = FileOperations.get_player(i + 1); //! player arr kullan
 			for (int j = 0; j < 8; j++) {
 				row[j + 1] = String.valueOf(data_arr[i][j]);
 			}
@@ -154,7 +155,7 @@ class UIManager {
 			HBox row = new HBox(10);
 			row.setAlignment(Pos.CENTER);
 	
-			Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + FileOperations.get_season_count() + ".flt", i, 1))]);
+			Label player1 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 1))]);
 			player1.setMinWidth(80);
 			player1.setAlignment(Pos.CENTER_RIGHT);
 	
@@ -178,7 +179,7 @@ class UIManager {
 			textFields.add(tf2);
 			tf2.setTextFormatter(new TextFormatter<>(change -> change.getControlNewText().length() <= 2 ? change : null));
 	
-			Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + FileOperations.get_season_count() + ".flt", i, 2))]);
+			Label player2 = new Label(player_arr[Integer.parseInt(FileOperations.get_data("seasonf" + season + ".flt", i, 2))]);
 			player2.setMinWidth(80);
 			player2.setAlignment(Pos.CENTER_LEFT);
 	
@@ -190,7 +191,7 @@ class UIManager {
 		for (int i = 0; i < textFields.size(); i++) {
 			TextField tf = textFields.get(i);
 			final int index = i; //? gerek var mı
-			String file_name = "seasonf" + FileOperations.get_season_count() + ".flt";
+			String file_name = "seasonf" + season + ".flt";
 			String value = FileOperations.get_data(file_name, index/2 + 1, index%2 +3);
 			if(!value.equals("-") && textFields.get(i).getText().isEmpty())
 				Platform.runLater(() -> textFields.get(index).setText(value));
@@ -200,8 +201,9 @@ class UIManager {
 					valueToSet = "-";
 				}
 				FileOperations.set_data(file_name, (index / 2) + 1, (index % 2) + 3, valueToSet);
-				ArrayOperations.fixture_to_season_array(player_count, data_arr);
+				ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
 				updateTable();
+				System.err.println(season);
 			});
 		}
 	}
@@ -214,47 +216,63 @@ class UIManager {
 		return vbox;
 	}
 	
-    private Button create_season_menu(int season) {
+    private Button create_season_menu() {
         menuButton = new Button("Sezonlar");
         contextMenu = new ContextMenu();
 
-        update_season_menu(season);
+        update_season_menu();
         menuButton.setOnAction(e -> contextMenu.show(menuButton,
                 menuButton.localToScreen(0, menuButton.getHeight()).getX(),
                 menuButton.localToScreen(0, menuButton.getHeight()).getY()));
 		return (menuButton);
     }
 
-	private void update_season_menu(int season) {
-        contextMenu.getItems().clear();
-        int season_count = FileOperations.get_season_count();
-        for (int i = 1; i <= season_count; i++) {
-            MenuItem item = new MenuItem("Sezon " + i);
-            contextMenu.getItems().add(item);
-        }
-        
-        MenuItem newSeason = new MenuItem("YENİ SEZON +");
-        newSeason.setOnAction(e -> {
-            new_season(season);
-        });
-        
-        contextMenu.getItems().add(newSeason);
-    }
-
-	private void new_season(int season)
+	private void update_season_menu() {
+		contextMenu.getItems().clear();
+		for (int i = 1; i <= FileOperations.get_season_count(); i++) {
+			final int final_i = i;  // i'nin kopyasını al ve final olarak kullan
+			MenuItem item = new MenuItem("Sezon " + i);
+			item.setOnAction(e -> {
+				this_season(final_i);
+			});
+			contextMenu.getItems().add(item);
+		}
+	
+		MenuItem newSeason = new MenuItem("YENİ SEZON +");
+		newSeason.setOnAction(e -> {
+			new_season();
+		});
+	
+		contextMenu.getItems().add(newSeason);
+	}
+	
+	private void this_season(int i)
 	{
 		FileOperations.fill_season_data(season, data_arr);
-		season++;
+		season = i;
+		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
+		//FileOperations.fill_the_array(season, data_arr);
+		updateRightPane();
+		updateTable();
+		rename_stage();
+	}
+
+	private void new_season()
+	{
+		FileOperations.fill_season_data(season, data_arr);
+		season = FileOperations.get_season_count()+1;
 		FileOperations.set_data("main_data.flt", 1, 2, String.valueOf(season));
 		FileOperations.create_new_season();
-		ArrayOperations.initialize(data_arr);
 		FileOperations.create_new_fixture(player_count);
-		ArrayOperations.fixture_to_season_array(player_count, data_arr);
-		FileOperations.fill_season_data(season, data_arr);
-		player_arr = FileOperations.create_player_array(); //>  ismini değiş fonksiyonun
-		update_season_menu(season);
+		ArrayOperations.initialize(data_arr);
+		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
+		FileOperations.fill_season_data(season, data_arr); //? gerek var mı
+		updateTable();
+		update_season_menu();
 		rename_stage();
 		updateRightPane();
+		//player_arr = FileOperations.create_player_array(); //>  ismini değiş fonksiyonun
+		//FileOperations.fill_the_array(season, data_arr);
 	}
 
     private void applyStyles(BorderPane root, VBox rightPane, Button menuButton) {

@@ -187,14 +187,14 @@ public class FileOperations {
         return (arr);
     }
 
-	public static String[] give_fixture_line(int n)
+	public static String[] give_fixture_line(int line_num, int season)
 	{
 		String[] ret = new String[4];
         try {
-            File file = new File("../data/" + "seasonf" + get_season_count() + ".flt");
+            File file = new File("../data/" + "seasonf" + season + ".flt");
             String player_data = "";
             Scanner scanner = new Scanner(file);
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < line_num; i++) {
                 player_data = scanner.nextLine();
             }
 			ret = player_data.split(" ");
