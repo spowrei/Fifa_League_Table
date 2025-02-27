@@ -12,6 +12,7 @@ import javafx.geometry.Insets;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.TableColumn;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -64,7 +65,7 @@ class UIManager {
 	private List<TextField> textFields;
 	private String[] player_arr;
 	private VBox vbox;
-	private TableView<String[]> table;
+	private TableView<String[]> table; //! ObservableList yapılabilir mi
 	private int season;
 
     UIManager(int[][] arr, Stage primaryStage) {
@@ -135,10 +136,38 @@ class UIManager {
 			}
 			data.add(row);
 		}
-	
 		table.setItems(data);
 	}
 	
+	private void sort_table() //> daha iyi hale getir
+	{
+		int[] temp_arr = new int[player_count];
+		for (int i = 0; i < player_count; i++) {
+			temp_arr[i] = i;
+		}
+		for (int i = 0; i < player_count-1; i++) {
+			for (int j = i+1; j < player_count; j++) {
+				int i_point = data_arr[temp_arr[i]][4]*10000+data_arr[temp_arr[i]][7]*100 +data_arr[temp_arr[i]][5];
+				int j_point = data_arr[temp_arr[j]][4]*10000+data_arr[temp_arr[j]][7]*100 +data_arr[temp_arr[j]][5];
+				if(i_point<j_point){
+					int temp = temp_arr[i];
+					temp_arr[i] = temp_arr[j];
+					temp_arr[j] = temp;
+				}
+			}
+		}
+		System.out.println(temp_arr[0] + " " +temp_arr[1] + " " +temp_arr[2] + " " +temp_arr[3] + " " +temp_arr[4] + " ");
+		ObservableList<String[]> sortedList = FXCollections.observableArrayList();
+		ObservableList<String[]> items = table.getItems();
+	
+		for (int i = 0; i < player_count; i++) {
+			sortedList.add(items.get(temp_arr[i]));
+		}
+	
+		// Güncellenmiş listeyi ata
+		table.setItems(sortedList);
+	}
+
     private void updateRightPane() {
 		player_arr = FileOperations.create_player_array();
 		int line_count = 0;
@@ -190,7 +219,7 @@ class UIManager {
 		// TextField'lerin verilerini tekrar bağla
 		for (int i = 0; i < textFields.size(); i++) {
 			TextField tf = textFields.get(i);
-			final int index = i; //? gerek var mı
+			final int index = i;
 			String file_name = "seasonf" + season + ".flt";
 			String value = FileOperations.get_data(file_name, index/2 + 1, index%2 +3);
 			if(!value.equals("-") && textFields.get(i).getText().isEmpty())
@@ -203,7 +232,7 @@ class UIManager {
 				FileOperations.set_data(file_name, (index / 2) + 1, (index % 2) + 3, valueToSet);
 				ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
 				updateTable();
-				System.err.println(season);
+				sort_table();
 			});
 		}
 	}
@@ -230,7 +259,7 @@ class UIManager {
 	private void update_season_menu() {
 		contextMenu.getItems().clear();
 		for (int i = 1; i <= FileOperations.get_season_count(); i++) {
-			final int final_i = i;  // i'nin kopyasını al ve final olarak kullan
+			final int final_i = i;
 			MenuItem item = new MenuItem("Sezon " + i);
 			item.setOnAction(e -> {
 				this_season(final_i);
@@ -251,7 +280,6 @@ class UIManager {
 		FileOperations.fill_season_data(season, data_arr);
 		season = i;
 		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
-		//FileOperations.fill_the_array(season, data_arr);
 		updateRightPane();
 		updateTable();
 		rename_stage();
