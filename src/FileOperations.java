@@ -97,24 +97,22 @@ public class FileOperations {
 
 	public static void create_new_season() {
 		int new_season = get_season_count();
-		String[] file_names = { "season" + new_season, "seasonf" + new_season };
+		String file_name = "seasonf" + new_season;
 
-		for (int i = 0; i < 2; i++) {
-			String file_name = file_names[i];
-			try {
-				File file = new File("../data/" + file_name + ".flt");
-				if (!file.createNewFile()) {
-					System.out.println("Dosya zaten var: " + file_name);
-				}
-			} catch (IOException e) {
-				System.err.println("Season cannot be created: " + e.getMessage());
+		try {
+			File file = new File("../data/" + file_name + ".flt");
+			if (!file.createNewFile()) {
+				System.out.println("Dosya zaten var: " + file_name);
 			}
+		} catch (IOException e) {
+			System.err.println("Season cannot be created: " + e.getMessage());
 		}
+
 	}
 
 	public static void fill_the_array(int season_num, int[][] arr) {
 		int player_count = arr.length;
-		
+
 		for (int i = 1; i <= player_count; i++) {
 			for (int j = 2; j <= 9; j++) {
 				arr[i - 1][j - 2] = Integer.parseInt(get_data("season" + season_num + ".flt", i, j));

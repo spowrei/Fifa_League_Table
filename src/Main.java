@@ -74,9 +74,9 @@ class UIManager {
 	}
 
 	public BorderPane createUI() {
-		table = createTable();
-		updateTable();
-		VBox rightPane = createRightPane();
+		table = create_table();
+		update_table();
+		VBox rightPane = create_right_pane();
 		menuButton = create_season_menu();
 
 		SplitPane splitPane = new SplitPane(table, rightPane);
@@ -85,11 +85,11 @@ class UIManager {
 		BorderPane root = new BorderPane();
 		root.setTop(topBar);
 		root.setCenter(splitPane);
-		applyStyles(root, rightPane, menuButton);
+		apply_styles(root, rightPane, menuButton);
 		return root;
 	}
 
-	private TableView<String[]> createTable() {
+	private TableView<String[]> create_table() {
 		TableView<String[]> new_table = new TableView<>();
 		String[] columnNames = { "Oyuncu", "OM", "G", "B", "M", "P", "AG", "YG", "A" };
 
@@ -102,7 +102,7 @@ class UIManager {
 		return new_table;
 	}
 
-	private void updateTable() {
+	private void update_table() {
 		ObservableList<String[]> data = FXCollections.observableArrayList();
 
 		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
@@ -148,7 +148,7 @@ class UIManager {
 		table.setItems(sortedList);
 	}
 
-	private void updateRightPane() {
+	private void update_right_pane() {
 		int line_count = 0;
 
 		for (int i = 1; i < player_count; i++) {
@@ -206,17 +206,17 @@ class UIManager {
 				}
 				FileOperations.set_data(file_name, (index / 2) + 1, (index % 2) + 3, valueToSet);
 				ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
-				updateTable();
+				update_table();
 				sort_table();
 			});
 		}
 	}
 
-	private VBox createRightPane() {
+	private VBox create_right_pane() {
 		vbox = new VBox(5);
 		vbox.setPadding(new Insets(5, 0, 0, 0));
 		textFields = new ArrayList<>();
-		updateRightPane();
+		update_right_pane();
 		return vbox;
 	}
 
@@ -251,8 +251,8 @@ class UIManager {
 	private void this_season(int i) {
 		season = i;
 		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
-		updateRightPane();
-		updateTable();
+		update_right_pane();
+		update_table();
 		rename_stage();
 	}
 
@@ -263,26 +263,25 @@ class UIManager {
 		FileOperations.create_new_fixture(player_count);
 		ArrayOperations.initialize(data_arr);
 		ArrayOperations.fixture_to_season_array(data_arr, player_count, season);
-		updateTable();
+		update_table();
 		update_season_menu();
 		rename_stage();
-		updateRightPane();
+		update_right_pane();
 	}
 
-	private void applyStyles(BorderPane root, VBox rightPane, Button menuButton) {
+	private void apply_styles(BorderPane root, VBox rightPane, Button menuButton) {
 		String css = """
-				    -fx-background-color:rgb(233, 233, 233);
-				    -fx-control-inner-background:rgb(233, 233, 233);
-				    -fx-accent:rgb(219, 10, 10);
-				    -fx-focus-color:rgb(243, 8, 212);
-				    -fx-text-fill: #000000;
-				    -fx-font-size: 18px;
-				    -fx-font-family: 'Arial';
+					-fx-background-color:rgb(233, 233, 233);
+					-fx-control-inner-background:rgb(233, 233, 233);
+					-fx-accent:rgb(169, 218, 169);
+					-fx-focus-color: rgb(169, 218, 169);
+					-fx-text-fill: rgb(233, 233, 233);
+					-fx-font-size: 16px;
+					-fx-font-family: 'Arial';
 				""";
-
+	
 		root.setStyle(css);
-		table.setStyle("-fx-background-color:rgb(93, 146, 245); -fx-text-fill:rgb(233, 233, 233);");
-		rightPane.setStyle("-fx-background-color:rgb(240, 206, 15); -fx-text-fill:rgb(233, 233, 233);");
-		menuButton.setStyle("-fx-background-color:rgb(33, 206, 91); -fx-text-fill:rgb(233, 233, 233);");
+		rightPane.setStyle("-fx-background-color:rgb(169, 218, 169); -fx-text-fill: #f1fa8c;");
+		menuButton.setStyle("-fx-background-color:rgb(123, 163, 123); -fx-text-fill: #ffffff;");
 	}
 }
